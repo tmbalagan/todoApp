@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>TodoApp</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <h5 class="navbar-text">TodoApp</h5>
+    <a href="/">
+        <button type="button" class="btn btn-warning">Logout</button>
+    </a>
+
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10 mt-3">
+            <form id="task_form" method="post" action="/task" role="form">
+                <div class="form-group">
+                    <label for="text" class="h3">Add Task</label>
+                    <textarea type="text" class="form-control" placeholder="Enter Task" rows="2" name="text"
+                              class="task"
+                              style="width: 50%"></textarea>
+                </div>
+                <button type="submit" class="btn bg-info text-white mb-2" id="submit">addTask</button>
+            </form>
+
+            <table class="table table-bordered table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Task</th>
+                    <th scope="col">Date</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if(data.length > 0){ %>
+                <% for(var i = 0; i < data.length; i++){ %>
+                <tr>
+                    <td><%= data[i].text %></td>
+                    <td><%= data[i].created_date %></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm delete_row" value="<%= data[i].task_id %>">
+                            Delete
+                        </button>
+
+                        <button type="button" class="btn btn-success btn-sm edit_row" data-toggle="modal"
+                                data-target=".bd-example-modal-sm" value="<%= data[i].task_id %>">Edit
+                        </button>
+                    </td>
+                </tr>
+                <% } %>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+<!--model  for edit-->
+<div class="modal fade bd-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true" id="edit_text_model">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="" name="edit_form" id="edit_form" role="form">
+                    <div class="form-group">
+                        <label for="edit_text" class="col-form-label">Task</label>
+                        <textarea class="form-control" id="edit_text" name="text"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-sm edit_btn">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+
+<script>
+
+    $(document).ready(function () {
+        /*code for delete row tasks*/
+        $('.delete_row').on('click', function (e) {
+            e.preventDefault();
+//        $(this).closest("tr").remove();
+            var rowElement = $(this).closest("tr").remove();
+            console.log('*** = ', $(this).val());
+            var delete_id = $(this).val();
+            $.ajax({
+                type: 'DELETE',
+                url: 'http://localhost:8080/deleteTask/' + delete_id,
+                data: {delete_id: delete_id},
+                success: function (data) {
+                    rowElement.fadeOut(500);
+                }
+            });
+        });
+        /*end here */
+
+         // new EJS({url: 'userTask.ejs'}).render(data);
+
+        /*-------------------------------------------edit row--------------------------------------------*/
+        $('.edit_row').on('click', function () {
+            var val = $(this).val();
+            console.log('val = ', val);
+            $('.edit_btn').attr('value', val);
+            var row_text = $(this).parent().siblings().first().text();
+            $('#edit_text').text(row_text);
+        });
+        $('#edit_form').on("submit", function (e) {
+            e.preventDefault();
+            console.log('in edit ****');
+            var update_id = $('.edit_btn').val();
+            console.log('in edit ****', typeof update_id);
+            var task = $("#edit_text").val();
+            var formData = {"text": task, "update_id": update_id};
+            console.log('formData = ', formData);
+            $.ajax({
+                type: 'PUT',
+                url: 'http://localhost:8080/updateTask/' + update_id,
+                data: formData,
+                success: function (data) {
+                    $('#myModal').modal('hide');
+                    window.location.href = "http://localhost:8080/userTasks"
+                    console.log('error in edit success = ', data);
+                }, error: function (err) {
+                    console.log('error in edit form update', err);
+                }
+            });
+        });
+    });
+
+    /*end edit row*/
+</script>
+</body>
+</html>
