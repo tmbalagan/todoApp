@@ -2,18 +2,15 @@ var users = require('../modals/user');
 
 /*-----------------------signUp export---------------------------------*/
 
-exports.signUp = function(req, res){
+exports.signUp = function (req, res) {
     var message = '';
-    users.signUp(req, function(err, result){
-        if(err){
-            //throw err;
+    users.signUp(req, function (err, result) {
+        if (err) {
             message = "please fill up all fields"
-            console.log('in sevice up err');
-        }else{
+            res.render('signUp.ejs', {message: message});
+        } else {
             message = "Successfully signUp"
-            console.log('in sevice up result');
-            //res.send({success:true});
-            res.render('signUp.ejs',{message:message});
+            res.render('signUp.ejs', {message: message});
         }
 
     });
@@ -22,22 +19,14 @@ exports.signUp = function(req, res){
 /*-----------------------signIn export---------------------------------*/
 
 
-exports.signIn = function(req, res){
-    var message = '';
-    users.signIn(req, function(err, result){
-        if(err){
-            //throw err;
-            console.log('in sevice in err');
-            message = "Wrong Credentials"
+exports.signIn = function (req, res) {
+    users.signIn(req, function (err, result) {
+        if (err) {
             res.redirect('/');
-        }else if(!result){
-            console.log('in !result ---')
-            //res.render('todoapp/tasks');
+        } else if (!result) {
             res.redirect('/')
-        }else{
-            console.log('in success result');
+        } else {
             res.redirect('/userTasks');
-            //res.send({success:true,data:result});
         }
 
     });

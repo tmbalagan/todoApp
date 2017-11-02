@@ -7,9 +7,7 @@ exports.tasks = function(req, res) {
         if(err){
             throw err;
         }else{
-            //console.log('result = ',result);
             res.redirect('/userTasks');
-            //res.status(200);
         }
     });
 }
@@ -21,17 +19,12 @@ exports.userTasks = function(req, res) {
         if(err){
             throw err;
         }else{
-            console.log('result = ',result);
-            //res.send({success:true,data:result})
-            console.log(' req.session.name = ', req.session.name);
-            //var user = req.session.user;
             var name = req.session.name;
             if(name == undefined){
-                console.log('in usertask /');
                 res.redirect("/");
                 return;
             }else{
-                console.log('in usertask ejs');
+                var message = "hhh"
                 res.render('userTask',{data:result});
             }
         }
@@ -45,10 +38,8 @@ exports.delUserTask = function(req, res) {
         if(err){
             throw err;
         }else{
-            console.log('result = ',result);
-            //res.send({success:true,data:result})
-            //res.render('userTask.ejs');
-
+            var message = "Deleted Successfully"
+            res.render('userTask',{data:result});
         }
     });
 }
@@ -60,9 +51,7 @@ exports.editUserTask = function(req, res) {
         if(err){
             throw err;
         }else{
-            console.log('result = ',result);
             res.render('userTask',{data:result});
-            //res.redirect("/userTask");
         }
     });
 }

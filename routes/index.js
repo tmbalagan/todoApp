@@ -1,6 +1,6 @@
 exports.signIn = function(req, res){
     var message = '';
-    res.render('signIn',{message: message});
+    res.render('signIn');
 
 };
 exports.signUp = function(req, res){

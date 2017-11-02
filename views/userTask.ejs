@@ -7,6 +7,7 @@
     <title>TodoApp</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
 <body>
 <nav class="navbar navbar-light bg-light">
@@ -30,7 +31,6 @@
                 </div>
                 <button type="submit" class="btn bg-info text-white mb-2" id="submit">addTask</button>
             </form>
-
             <table class="table table-bordered table-sm">
                 <thead>
                 <tr>
@@ -46,17 +46,25 @@
                     <td><%= data[i].text %></td>
                     <td><%= data[i].created_date %></td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm delete_row" value="<%= data[i].task_id %>">
-                            Delete
+
+                        <button type="button" class="btn btn-danger btn-sm delete_row" data-toggle="modal"
+                                data-target=".delete-row" value="<%= data[i].task_id %>">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
                         </button>
 
-                        <button type="button" class="btn btn-success btn-sm edit_row" data-toggle="modal"
-                                data-target=".bd-example-modal-sm" value="<%= data[i].task_id %>">Edit
+                        <button type="button" class="btn btn-info btn-sm edit_row" data-toggle="modal"
+                                data-target=".bd-example-modal-sm" value="<%= data[i].task_id %>">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                         </button>
+
                     </td>
                 </tr>
                 <% } %>
-                <% } %>
+                <% }else { %>
+                <tr>
+                    <td colspan="3" class="text-center bg-info text-white">Add new task</td>
+                </tr>
+                <% } %>>
                 </tbody>
             </table>
         </div>
@@ -89,8 +97,28 @@
         </div>
     </div>
 </div>
-
-
+<!---->
+<!--model for delete-->
+<div class="modal fade delete-row" id="myModalDel" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true" id="edit_text_model">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success btn-sm del_btn">Delete</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!---->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
@@ -106,18 +134,28 @@
 
     $(document).ready(function () {
         /*code for delete row tasks*/
-        $('.delete_row').on('click', function (e) {
+
+        $('.delete_row').on('click', function () {
+            var val = $(this).val();
+            console.log('val = ', val);
+            $('.del_btn').attr('value', val);
+        });
+
+        $('.del_btn').on('click', function (e) {
             e.preventDefault();
-//        $(this).closest("tr").remove();
-            var rowElement = $(this).closest("tr").remove();
-            console.log('*** = ', $(this).val());
+            $(this).closest("tr").remove();
             var delete_id = $(this).val();
+            console.log('*************************** ',delete_id);
             $.ajax({
                 type: 'DELETE',
                 url: 'http://localhost:8080/deleteTask/' + delete_id,
                 data: {delete_id: delete_id},
                 success: function (data) {
-                    rowElement.fadeOut(500);
+                    console.log('innnnnnnnnnnnnnnnnnnnnnnnnn')
+                    $('#myModalDel').modal('hide');
+                    window.location.href = "http://localhost:8080/userTasks"
+                },error: function(error){
+                    console.log('in er ***************8')
                 }
             });
         });
@@ -149,6 +187,8 @@
                     $('#myModal').modal('hide');
                     window.location.href = "http://localhost:8080/userTasks"
                     console.log('error in edit success = ', data);
+//                    new EJS().render(data);
+
                 }, error: function (err) {
                     console.log('error in edit form update', err);
                 }

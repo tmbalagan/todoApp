@@ -11,7 +11,7 @@ var MySQLStore = require('express-mysql-session')(session);
 var app = express();
 var mysql      = require('mysql');
 var bodyParser = require("body-parser");
-
+var expressValidator = require('express-validator');
 //mysql database connection
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -43,8 +43,8 @@ var options = {
     user: 'root',// Database user.
     password: 'mysql',// Password for the above database user.
     database: 'login',// Database name.
-    checkExpirationInterval: 900000,// How frequently expired sessions will be cleared; milliseconds.
-    expiration: 86400000,// The maximum age of a valid session; milliseconds.
+    //checkExpirationInterval: 900000,// How frequently expired sessions will be cleared; milliseconds.
+    //expiration: 86400000,// The maximum age of a valid session; milliseconds.
     createDatabaseTable: true,// Whether or not to create the sessions database table, if one does not already exist.
     connectionLimit: 1,// Number of connections when creating a connection pool
     schema: {
@@ -63,6 +63,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(expressValidator());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: 'pingpong',
@@ -72,7 +73,7 @@ app.use(session({
     cookie: { maxAge: 60000 }
 }));
 /*-----------------------routes---------------------------------*/
-app.get('/', routes.signIn);//call for main signIn page
+//app.get('/', routes.signIn);//call for main signIn page
 app.get('/signUp', routes.signUp);//call for signUp page
 //app.get('/userTasks', routes.userTasks);//call for signUp page
 app.get('/logout', routes.logout);
